@@ -1,3 +1,42 @@
+require 'pry-byebug'
+
+module Winnable
+  def winner?(p)
+    case @board
+    # Wins horizontally
+    when board.slice(0, 3).all? {|cell| cell == p[:mark]}
+      winner = p
+      true
+    when board.slice(3, 3).all? {|cell| cell == p[:mark]}
+      winner = p
+      true
+    when board.slice(6, 3).all? {|cell| cell == p[:mark]}
+      winner = p
+      true
+    # Wins vertically
+    when board[0] == p[:mark] && board[3] == p[:mark] && board[6] == p[:mark] 
+      winner = p
+      true
+    when board[1] == p[:mark] && board[4] == p[:mark] && board[7] == p[:mark]
+      winner = p
+      true
+    when board[2] == p[:mark] && board[5] == p[:mark] && board[8] == p[:mark]
+      winner = p
+      true
+    # Wins diagonally \
+    when board[0] == p[:mark] && board[4] == p[:mark] && board[8] == p[:mark]
+      winner = p
+      true
+    # Wins diagonally /
+    when board[2] == p[:mark] && board[4] == p[:mark] && board[6] == p[:mark]
+      winner = p
+      true
+    else
+      false
+    end
+  end
+end
+
 class Gameboard
   include Winnable
   attr_accessor :board, :player, :computer
@@ -75,7 +114,7 @@ class Gameboard
   end
 
   def score?
-    if winner?(@player) && @winner = @player
+    if winner?(@player)
       puts "You win!"
       true
     elsif winner?(@computer) && @winner = @computer
@@ -88,47 +127,13 @@ class Gameboard
 
 end
 
-module Winnable
-  def winner?(p)
-    case @board
-    # Wins horizontally
-    when board.slice(0, 3).all? {|cell| cell == p[:mark]}
-      winner = p
-      true
-    when board.slice(3, 3).all? {|cell| cell == p[:mark]}
-      winner = p
-      true
-    when board.slice(6, 3).all? {|cell| cell == p[:mark]}
-      winner = p
-      true
-    # Wins vertically
-    when board[0] == p[:mark] && board[3] == p[:mark] && board[6] == p[:mark] 
-      winner = p
-      true
-    when board[1] == p[:mark] && board[4] == p[:mark] && board[7] == p[:mark]
-      winner = p
-      true
-    when board[2] == p[:mark] && board[5] == p[:mark] && board[8] == p[:mark]
-      winner = p
-      true
-    # Wins diagonally \
-    when board[0] == p[:mark] && board[4] == p[:mark] && board[8] == p[:mark]
-      winner = p
-      true
-    # Wins diagonally /
-    when board[2] == p[:mark] && board[4] == p[:mark] && board[6] == p[:mark]
-      winner = p
-      true
-    else
-      false
-    end
-  end
-end
+
 
 # create board
 board = Gameboard.new()
 
 while true
+  binding.pry
   if board.score?
     board.play_again?
   else
