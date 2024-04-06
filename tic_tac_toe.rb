@@ -1,35 +1,65 @@
 require 'pry-byebug'
 
 module Winnable
-  def winner?(p)
-    case @board
+  # Define win conditions
+   def winner?(p)
+    row1 = [0, 1, 2]
+    row2 = [3, 4, 5]
+    row3 = [6, 7, 8]
+    column1 = [0, 3, 6]
+    column2 = [1, 4, 7]
+    column3 = [2, 5, 8]
+    diag_top_left = [0, 4, 8]
+    diag_top_right = [2, 4, 6]
+    # check p move history
+    if p[:moves] == row1 || row2 || row3 ||
+                    column1 || column2 || column3 ||
+                    diag_top_left || diag_top_right
+                    then
+      p[:winner] = true
+      true
+    else
+      false
+    end
+  end
     # Wins horizontally
-    when board.slice(0, 3).all? {|cell| cell == p[:mark]}
-      winner = p
+    # when 
+      
+    # when @board.slice(3, 3).all? {|cell| cell == p[:mark]}
+    #   p[:winner] = true
+    #   true
+    # when @board.slice(6, 3).all? {|cell| cell == p[:mark]}
+    #   p[:winner] = true
+    #   true
+    # # Wins vertically
+    # when @board[0] == p[:mark] && board[3] == p[:mark] && board[6] == p[:mark] 
+    #   p[:winner] = true
+    #   true
+    # when @board[1] == p[:mark] && board[4] == p[:mark] && board[7] == p[:mark]
+    #   p[:winner] = true
+    #   true
+    # when @board[2] == p[:mark] && board[5] == p[:mark] && board[8] == p[:mark]
+    #   p[:winner] = true
+    #   true
+    # # Wins diagonally \
+    # when @board[0] == p[:mark] && board[4] == p[:mark] && board[8] == p[:mark]
+    #   p[:winner] = true
+    #   true
+    # # Wins diagonally /
+    # when @board[2] == p[:mark] && board[4] == p[:mark] && board[6] == p[:mark]
+    #   p[:winner] = true
+    #   true
+    # else
+    #   false
+    # end
+  
+
+  def score?
+    if winner?(self.player)
+      puts "You win!"
       true
-    when board.slice(3, 3).all? {|cell| cell == p[:mark]}
-      winner = p
-      true
-    when board.slice(6, 3).all? {|cell| cell == p[:mark]}
-      winner = p
-      true
-    # Wins vertically
-    when board[0] == p[:mark] && board[3] == p[:mark] && board[6] == p[:mark] 
-      winner = p
-      true
-    when board[1] == p[:mark] && board[4] == p[:mark] && board[7] == p[:mark]
-      winner = p
-      true
-    when board[2] == p[:mark] && board[5] == p[:mark] && board[8] == p[:mark]
-      winner = p
-      true
-    # Wins diagonally \
-    when board[0] == p[:mark] && board[4] == p[:mark] && board[8] == p[:mark]
-      winner = p
-      true
-    # Wins diagonally /
-    when board[2] == p[:mark] && board[4] == p[:mark] && board[6] == p[:mark]
-      winner = p
+    elsif winner?(@computer)
+      puts "The computer wins!"
       true
     else
       false
@@ -37,16 +67,26 @@ module Winnable
   end
 end
 
+# methods for displaying the gameboard
+module Showable
+  def show_board
+    @board.each_slice(3).with_index { |cell, index|
+      puts "\t\t#{cell}"
+    }
+  end
+end
+
+# Gameboard object
 class Gameboard
   include Winnable
+  include Showable
   attr_accessor :board, :player, :computer
-
+  #create gameboard, player, set up
   def initialize
-    @player = {mark: "X", turn: nil}
-    @computer = {mark: "O", turn: nil}
+    @player = {mark: "X", turn: nil, winner: false, moves: []}
+    @computer = {mark: "O", turn: nil, winner: false, moves: []}
     puts "\tLet's play Tic Tac Toe!"
     @board = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-    @winner = nil
     show_board
     puts "\tYou are 'X' and the computer is 'O'"
     puts "\tEnter the digit of the area you want to mark"
@@ -56,12 +96,6 @@ class Gameboard
     elsif @player[:turn] == false
       puts "\tComputer moves first."
     end
-  end
-
-  def show_board
-    @board.each_slice(3).with_index { |cell, index|
-      puts "\t\t#{cell}"
-    }
   end
 
   def play_again?
@@ -104,39 +138,33 @@ class Gameboard
   end
 
   def get_player_move
-    # make sure the player selects an empty (non-integer) cell before returning
     move = gets.chomp.to_i
-    unless move.is_a? Integer
-      puts "Invalid selection. Please enter a number"
-    end
-    @board[move] = @player[:mark]
-    show_board
-  end
-
-  def score?
-    if winner?(@player)
-      puts "You win!"
-      true
-    elsif winner?(@computer) && @winner = @computer
-      puts "The computer wins!"
-      true
+    if move < 9 && @board[move] != @computer[:mark]
+      @board[move] = @player[:mark]
+      @player[:moves].push(move)
+      show_board
     else
-      false
+      while move >= 9
+        puts "Invalid selection."
+        move = gets.chomp.to_i
+      end
     end
   end
-
 end
 
 
 
 # create board
-board = Gameboard.new()
-
-while true
-  binding.pry
-  if board.score?
-    board.play_again?
+game = Gameboard.new()
+player_wins = game.player[:winner] = true
+# game loop
+i = 0
+while i < 10
+  #binding.pry
+  if game.score?
+    game.play_again?
   else
-    board.get_turn
+    game.get_turn
   end
+  i =+ 1
 end
