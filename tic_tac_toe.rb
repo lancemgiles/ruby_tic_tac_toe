@@ -1,4 +1,5 @@
 class Gameboard
+  include Winnable
   attr_accessor :board, :player, :computer
 
   def initialize
@@ -6,6 +7,7 @@ class Gameboard
     @computer = {mark: "O", turn: nil}
     puts "\tLet's play Tic Tac Toe!"
     @board = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    @winner = nil
     show_board
     puts "\tYou are 'X' and the computer is 'O'"
     puts "\tEnter the digit of the area you want to mark"
@@ -61,28 +63,75 @@ class Gameboard
     puts "to do"
     show_board
   end
+
   def get_player_move
     # make sure the player selects an empty (non-integer) cell before returning
     move = gets.chomp.to_i
     unless move.is_a? Integer
       puts "Invalid selection. Please enter a number"
     end
-    @board[move] = "X"
+    @board[move] = @player[:mark]
     show_board
   end
 
-  def winner?
-    # check if any win condition met
-    # check who won
-    # display winner
-    play_again?
+  def score?
+    if winner?(@player) && @winner = @player
+      puts "You win!"
+      true
+    elsif winner?(@computer) && @winner = @computer
+      puts "The computer wins!"
+      true
+    else
+      false
+    end
   end
 
 end
+
+module Winnable
+  def winner?(p)
+    case @board
+    # Wins horizontally
+    when board.slice(0, 3).all? {|cell| cell == p[:mark]}
+      winner = p
+      true
+    when board.slice(3, 3).all? {|cell| cell == p[:mark]}
+      winner = p
+      true
+    when board.slice(6, 3).all? {|cell| cell == p[:mark]}
+      winner = p
+      true
+    # Wins vertically
+    when board[0] == p[:mark] && board[3] == p[:mark] && board[6] == p[:mark] 
+      winner = p
+      true
+    when board[1] == p[:mark] && board[4] == p[:mark] && board[7] == p[:mark]
+      winner = p
+      true
+    when board[2] == p[:mark] && board[5] == p[:mark] && board[8] == p[:mark]
+      winner = p
+      true
+    # Wins diagonally \
+    when board[0] == p[:mark] && board[4] == p[:mark] && board[8] == p[:mark]
+      winner = p
+      true
+    # Wins diagonally /
+    when board[2] == p[:mark] && board[4] == p[:mark] && board[6] == p[:mark]
+      winner = p
+      true
+    else
+      false
+    end
+  end
+end
+
 # create board
 board = Gameboard.new()
 
 while true
-  #board.winner?
-  board.get_turn
+  if board.score?
+    board.play_again?
+  else
+    board.get_turn
+  end
 end
