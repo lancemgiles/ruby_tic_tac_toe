@@ -12,53 +12,16 @@ module Winnable
     diag_top_left = [0, 4, 8]
     diag_top_right = [2, 4, 6]
     # check p move history
-    if p[:moves] == row1 || row2 || row3 ||
-                    column1 || column2 || column3 ||
-                    diag_top_left || diag_top_right
-                    then
-      p[:winner] = true
-      true
-    else
-      false
-    end
+    p[:moves] == (row1 || row2 || row3 ||
+      column1 || column2 || column3 || diag_top_right || diag_top_left)
+ 
+    
   end
-    # Wins horizontally
-    # when 
-      
-    # when @board.slice(3, 3).all? {|cell| cell == p[:mark]}
-    #   p[:winner] = true
-    #   true
-    # when @board.slice(6, 3).all? {|cell| cell == p[:mark]}
-    #   p[:winner] = true
-    #   true
-    # # Wins vertically
-    # when @board[0] == p[:mark] && board[3] == p[:mark] && board[6] == p[:mark] 
-    #   p[:winner] = true
-    #   true
-    # when @board[1] == p[:mark] && board[4] == p[:mark] && board[7] == p[:mark]
-    #   p[:winner] = true
-    #   true
-    # when @board[2] == p[:mark] && board[5] == p[:mark] && board[8] == p[:mark]
-    #   p[:winner] = true
-    #   true
-    # # Wins diagonally \
-    # when @board[0] == p[:mark] && board[4] == p[:mark] && board[8] == p[:mark]
-    #   p[:winner] = true
-    #   true
-    # # Wins diagonally /
-    # when @board[2] == p[:mark] && board[4] == p[:mark] && board[6] == p[:mark]
-    #   p[:winner] = true
-    #   true
-    # else
-    #   false
-    # end
-  
-
   def score?
-    if winner?(self.player)
+    if winner?(player)
       puts "You win!"
       true
-    elsif winner?(@computer)
+    elsif winner?(self.computer)
       puts "The computer wins!"
       true
     else
@@ -83,8 +46,8 @@ class Gameboard
   attr_accessor :board, :player, :computer
   #create gameboard, player, set up
   def initialize
-    @player = {mark: "X", turn: nil, winner: false, moves: []}
-    @computer = {mark: "O", turn: nil, winner: false, moves: []}
+    @player = {mark: "X", turn: nil, moves: []}
+    @computer = {mark: "O", turn: nil, moves: []}
     puts "\tLet's play Tic Tac Toe!"
     @board = [0, 1, 2, 3, 4, 5, 6, 7, 8]
     show_board
@@ -156,7 +119,7 @@ end
 
 # create board
 game = Gameboard.new()
-player_wins = game.player[:winner] = true
+
 # game loop
 i = 0
 while i < 10
