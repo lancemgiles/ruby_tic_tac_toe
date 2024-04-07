@@ -1,9 +1,9 @@
 require 'pry-byebug'
 
 module TicTacToe
-  WINNING_LINES = [[0, 1, 2], [3, 4, 5], [6, 7, 8],
-         [0, 3, 6], [1, 4, 7], [2, 5, 8],
-         [0, 4, 8], [2, 4, 6]]
+  WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9],
+         [1, 4, 7], [2, 5, 8], [3, 6, 9],
+         [1, 5, 9], [3, 5, 7]]
 
   class Gameboard
     def initialize(player1, player2)
@@ -106,7 +106,7 @@ module TicTacToe
   end
 
   class Computer < Player
-    def select_random_pos!
+    def select_pos!
       loop do
         selection = rand(9)
         return selection if @game.open_spots.include?(selection)
