@@ -1,8 +1,8 @@
 require 'pry-byebug'
-
+# Methods for determining if there's a winner
 module Winnable
-  # Define win conditions
    def winner?(p)
+    # Define win conditions
     row1 = [0, 1, 2]
     row2 = [3, 4, 5]
     row3 = [6, 7, 8]
@@ -12,10 +12,8 @@ module Winnable
     diag_top_left = [0, 4, 8]
     diag_top_right = [2, 4, 6]
     # check p move history
-    p[:moves] == (row1 || row2 || row3 ||
+    p[:moves].all? == (row1 || row2 || row3 ||
       column1 || column2 || column3 || diag_top_right || diag_top_left)
- 
-    
   end
   def score?
     if winner?(player)
@@ -38,7 +36,7 @@ module Showable
     }
   end
 end
-
+# Methods that are used for both player and computer moves
 module MakeMoves
   def make_move(p, m)
     @board[m] = p[:mark]
@@ -46,8 +44,6 @@ module MakeMoves
     show_board
   end
 end
-
-
 # Gameboard object
 class Gameboard
   include Winnable
@@ -75,7 +71,7 @@ class Gameboard
     puts "Play again? Type 'y' for yes"
     reply = gets.chomp
     if reply == 'y'
-      true
+      initialize
     else
       abort "Finished!"
     end
@@ -103,9 +99,12 @@ class Gameboard
       @computer[:turn] = false
     end
   end
-
+  #determine and select best possible move
   def get_computer_move
-    #determine and select best possible move
+    # if ((@computer[:moves] == []) && (@board[4] == 4))
+    #   move = 4
+    # elsif 
+
    # make_move(@computer, move)
   end
 
@@ -121,10 +120,6 @@ class Gameboard
     end
   end
 end
-
-
-
-
 
 # create board
 game = Gameboard.new()
