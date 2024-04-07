@@ -1,132 +1,119 @@
 require 'pry-byebug'
 
 module TicTacToe
-  WIN = [[0, 1, 2], [3, 4, 5], [6, 7, 8],
+  WINNING_LINES = [[0, 1, 2], [3, 4, 5], [6, 7, 8],
          [0, 3, 6], [1, 4, 7], [2, 5, 8],
          [0, 4, 8], [2, 4, 6]]
 
   class Gameboard
-    attr_accessor :board, :player, :computer
-    #create gameboard, player, set up
-    def initialize
-      @player = {mark: "X", turn: nil, moves: []}
-      @computer = {mark: "O", turn: nil, moves: []}
+    def initialize(player1, player2)
+      @board = Array.new(10)
+      @current_player_id = 0
+      @players = [player1.new(self, "X"), player2.new(self, "O")]
       puts "\tLet's play Tic Tac Toe!"
-      @board = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-      show_board
+      print_board
       puts "\tYou are 'X' and the computer is 'O'"
       puts "\tEnter the digit of the area you want to mark"
-      first_turn
-      if @player[:turn] == true
-        puts "\tYou start."
-      elsif @player[:turn] == false
-        puts "\tComputer moves first."
-      end
+      puts "#{current_player} go first."
     end
-
-    def show_board
-      @board.each_slice(3){ |cell|
-        puts "\t\t#{cell}"
-      }
-    end
-
-    def make_move(p, m)
-      @board[m] = p[:mark]
-      p[:moves].push(m)
-      show_board
-    end
-
-    def game_loop
+    attr_reader :board, :current_player_id
+    # game loop
+    def play
       loop do
-        get_turn
-        if winner?(@player)
-          puts "You win!"
-        elsif winner?(@computer)
-          puts "Computer wins!"
-        elsif draw?
-          puts "Draw"
+        place_mark(current_player)
+        if winner?(current_player)
+          puts "#{current_player} wins!"
+          print_board
+          return
+        elsif full?
+          puts "Draw."
+          return
         end
-        binding.pry
+        switch_players!
       end
-      play_again
     end
 
-    def draw?
-      available_moves.empty?
+    def open_spots
+      (1..9).select {|position| @board[position].nil?}
     end
 
-    def available_moves
-      (0..8).select {|position| @board[position] != [position]}
+    def full?
+      open_spots.empty?
+    end
+
+    def place_mark(p)
+      pos = p.select_pos!
+      @board[pos] = p.mark
     end
 
     def winner?(p)
-      WIN.any? {|combo|
-        combo.all?{ |position| @board[position] == p[:moves]}
-      }
-    end
-
-    def score?
-      if winner?(self.player)
-        puts "You win!"
-        true
-      elsif winner?(self.computer)
-        puts "The computer wins!"
-        true
-      else
-        false
-      end
-    end
-    def play_again?
-      puts "Play again? Type 'y' for yes"
-      reply = gets.chomp
-      if reply == 'y'
-        initialize
-      else
-        abort "Finished!"
+      WINNING_LINES.any? do |line|
+        line.all? {|pos| @board[pos] == p.mark}
       end
     end
 
-    def first_turn
-      num = rand(2)
-      if num == 1
-        @player[:turn] = true
-        @computer[:turn] = false
-      else
-        @player[:turn] = false
-        @computer[:turn] = true
-      end
+    def other_player_id
+      1 - @current_player_id
     end
 
-    def get_turn
-      if @player[:turn] == true
-        get_player_move
-        @player[:turn] = false
-        @computer[:turn] = true
-      else
-        get_computer_move
-        @player[:turn] = true
-        @computer[:turn] = false
-      end
-    end
-    #determine and select best possible move
-    def get_computer_move
-      # if ((@computer[:moves] == []) && (@board[4] == 4))
-      #   move = 4
-      # elsif 
-      puts 'Computer move'
-     # make_move(@computer, move)
+    def switch_players!
+      @current_player_id = other_player_id
     end
 
-    def get_player_move
-      move = gets.chomp.to_i
-      if move < 9 && @board[move] != @computer[:mark]
-        make_move(@player, move)
-      else
-        while move >= 9
-          puts "Invalid selection."
-          move = gets.chomp.to_i
-        end
+    def current_player
+      @players[current_player_id]
+    end
+
+    def opponent
+      @players[other_player_id]
+    end
+
+    def turn_num
+      10 - open_spots.size
+    end
+
+    def print_board
+      column_sep = "|"
+      row_sep = "--+--+--"
+      label_pos = lambda{|pos| @board[pos] ? @board[pos] : pos}
+      row_display = lambda{|row| row.map(&label_pos).join(column_sep)}
+      row_pos= [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+      row_display = row_pos.map(&row_display)
+      puts row_display.join("\n" + row_sep + "\n")
+    end
+  end
+
+  class Player
+    def initialize(game, mark)
+      @game = game
+      @mark = mark
+    end
+    attr_reader :mark
+  end
+
+  class Human < Player
+    def select_pos!
+      @game.print_board
+      loop do
+        selection = gets.to_i
+        return selection if @game.open_spots.include?(selection)
+        puts "#{selection} is not available, try another."
       end
+    end
+    def to_s
+      "You"
+    end
+  end
+
+  class Computer < Player
+    def select_random_pos!
+      loop do
+        selection = rand(9)
+        return selection if @game.open_spots.include?(selection)
+      end
+    end
+    def to_s
+      "Computer"
     end
   end
 
@@ -135,16 +122,5 @@ end
 include TicTacToe
 
 # create board
-Gameboard.new().game_loop
-
-# game loop
-# i = 0
-# while i < 10
-#   #binding.pry
-#   if game.score?
-#     game.play_again?
-#   else
-#     game.get_turn
-#   end
-#   i =+ 1
-# end
+players = [Human, Computer].shuffle
+Gameboard.new(*players).play
