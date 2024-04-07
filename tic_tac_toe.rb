@@ -39,10 +39,20 @@ module Showable
   end
 end
 
+module MakeMoves
+  def make_move(p, m)
+    @board[m] = p[:mark]
+    p[:moves].push(m)
+    show_board
+  end
+end
+
+
 # Gameboard object
 class Gameboard
   include Winnable
   include Showable
+  include MakeMoves
   attr_accessor :board, :player, :computer
   #create gameboard, player, set up
   def initialize
@@ -96,16 +106,13 @@ class Gameboard
 
   def get_computer_move
     #determine and select best possible move
-    puts "to do"
-    show_board
+   # make_move(@computer, move)
   end
 
   def get_player_move
     move = gets.chomp.to_i
     if move < 9 && @board[move] != @computer[:mark]
-      @board[move] = @player[:mark]
-      @player[:moves].push(move)
-      show_board
+      make_move(@player, move)
     else
       while move >= 9
         puts "Invalid selection."
@@ -114,6 +121,8 @@ class Gameboard
     end
   end
 end
+
+
 
 
 
